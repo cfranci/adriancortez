@@ -2,6 +2,8 @@
 // Auth: POST /api/admin/login with the admin key sets a signed HttpOnly cookie.
 // All /api/admin/* routes require that cookie or "Authorization: Bearer <key>".
 
+import { handleCrm } from "./crm.js";
+
 const COOKIE = "ac_admin";
 const SESSION_HOURS = 24 * 7;
 
@@ -102,6 +104,8 @@ export default {
       if (!(await isAdmin(req, env))) return json({ error: "unauthorized" }, 401);
 
       if (path === "/api/admin/session" && req.method === "GET") return json({ ok: true });
+
+      if (path.startsWith("/api/admin/crm/")) return handleCrm(req, env, url);
 
       if (path === "/api/admin/content") {
         if (req.method === "GET") {

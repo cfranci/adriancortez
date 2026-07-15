@@ -79,6 +79,7 @@ label{display:block;font-size:.72rem;font-weight:600;letter-spacing:.12em;text-t
     <b>AC.</b>
     <div class="tabs">
       <button data-tab="leads" class="on">Leads<span class="count hide" id="leadCount"></span></button>
+      <button data-tab="crm">CRM</button>
       <button data-tab="listings">Listings</button>
       <button data-tab="copy">Site copy</button>
     </div>
@@ -93,6 +94,8 @@ label{display:block;font-size:.72rem;font-weight:600;letter-spacing:.12em;text-t
         <div id="leadList">Loading…</div>
       </div>
     </section>
+
+    <section id="tab-crm" class="hide"></section>
 
     <section id="tab-listings" class="hide">
       <div class="panel">
@@ -133,6 +136,7 @@ label{display:block;font-size:.72rem;font-weight:600;letter-spacing:.12em;text-t
 const $ = (s) => document.querySelector(s);
 const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const api = (p, opt = {}) => fetch(p, { credentials: "same-origin", headers: { "Content-Type": "application/json" }, ...opt });
+window.$ = $; window.esc = esc; window.api = api;
 
 let content = null;
 let dirty = false;
@@ -157,7 +161,7 @@ $("#logout").addEventListener("click", async () => { await api("/api/admin/logou
 document.querySelectorAll(".tabs button").forEach((b) =>
   b.addEventListener("click", () => {
     document.querySelectorAll(".tabs button").forEach((x) => x.classList.toggle("on", x === b));
-    ["leads", "listings", "copy"].forEach((t) => $("#tab-" + t).classList.toggle("hide", t !== b.dataset.tab));
+    ["leads", "crm", "listings", "copy"].forEach((t) => $("#tab-" + t).classList.toggle("hide", t !== b.dataset.tab));
   })
 );
 
@@ -254,6 +258,7 @@ $("#save").addEventListener("click", async () => {
 
 async function loadAll() {
   loadLeads();
+  if (window.crmInit) window.crmInit();
   const r = await api("/api/admin/content");
   content = (await r.json()) || {};
   renderEditors();
@@ -261,5 +266,27 @@ async function loadAll() {
 window.addEventListener("beforeunload", (e) => { if (dirty) e.preventDefault(); });
 boot();
 </script>
+<script src="/admin/crm.js"></script>
+<style>
+.crm-tools{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem}
+.crm-pills{display:flex;gap:.3rem;flex-wrap:wrap}
+.pill{font:inherit;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;background:none;border:1px solid var(--line);padding:.3rem .7rem;cursor:pointer;border-radius:999px}
+.pill.on{background:var(--tide);color:var(--paper);border-color:var(--tide)}
+.crm-row{display:flex;gap:.8rem;align-items:center;padding:.7rem .9rem;border:1px solid var(--line);background:#fff;margin-bottom:.5rem;cursor:pointer}
+.crm-row:hover{border-color:var(--tide2)}
+.crm-row.due{border-left:3px solid var(--tide)}
+.crm-row b{min-width:10rem}
+.chip{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;background:var(--tint);padding:.2rem .55rem;border-radius:999px}
+.dim{color:var(--slate);font-size:.82rem}
+.right{margin-left:auto}
+.crm-drawer{position:fixed;top:0;right:0;bottom:0;width:min(94vw,520px);background:var(--paper);border-left:1px solid var(--line);box-shadow:-12px 0 40px rgba(14,20,28,.18);padding:1.4rem;overflow:auto;z-index:20}
+.drawer-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.crm-log{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem}
+.crm-log input[type="date"]{max-width:10rem}
+.crm-log #crmLogBody{flex:1;min-width:12rem}
+.timeline{border-top:1px solid var(--line)}
+.tl-item{padding:.7rem 0;border-bottom:1px solid var(--line);font-size:.88rem}
+.tl-kind{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;background:var(--tint);padding:.15rem .5rem;border-radius:999px;margin-right:.5rem}
+</style>
 </body>
 </html>
