@@ -10,3 +10,8 @@ run_worker_first = ["/api/*"]
 [[kv_namespaces]]
 binding = "SITE"
 id = "PLACEHOLDER_KV_ID"
+
+[vars]
+SUPABASE_URL = "https://enytzzvnlfdsoqpckpxs.supabase.co"
+SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVueXR6enZubGZkc29xcGNrcHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQxNDM0NzQsImV4cCI6MjA5OTcxOTQ3NH0.CDFYhRoHQFqXOILprl-KWpPXgf5WMzkRoXO6EONDVww"
+ADMIN_EMAILS = "adrian.cortez@serhant.com"

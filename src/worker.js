@@ -39,10 +39,30 @@ function getCookie(req, name) {
   return m ? m[1] : null;
 }
 
+// Validate a Supabase access token by asking Supabase who it belongs to, then
+// checking that email against the allowlist. No JWT crypto in the worker, and
+// it works with any Supabase signing config (HS256 or the newer asymmetric keys).
+async function validateSupabase(env, token) {
+  if (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY || !token || token.split(".").length !== 3) return false;
+  try {
+    const r = await fetch(`${env.SUPABASE_URL}/auth/v1/user`, {
+      headers: { apikey: env.SUPABASE_ANON_KEY, Authorization: `Bearer ${token}` },
+    });
+    if (!r.ok) return false;
+    const u = await r.json();
+    if (!u.email) return false;
+    const allow = (env.ADMIN_EMAILS || "").toLowerCase().split(",").map((s) => s.trim()).filter(Boolean);
+    return allow.length === 0 || allow.includes(u.email.toLowerCase());
+  } catch {
+    return false;
+  }
+}
+
 async function isAdmin(req, env) {
   const bearer = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
-  if (bearer && bearer === env.ADMIN_KEY) return true;
-  return validToken(env, getCookie(req, COOKIE));
+  if (bearer && env.ADMIN_KEY && bearer === env.ADMIN_KEY) return true; // CLI / scripts
+  if (bearer && (await validateSupabase(env, bearer))) return true; // Adrian's browser login
+  return validToken(env, getCookie(req, COOKIE)); // admin-key cookie fallback
 }
 
 const clean = (v, max = 500) => String(v ?? "").trim().slice(0, max);
@@ -53,6 +73,11 @@ export default {
     const path = url.pathname;
 
     // ---------- public API ----------
+    // public: supabase config for the admin login page (anon key is public)
+    if (path === "/api/public-config" && req.method === "GET") {
+      return json({ supabaseUrl: env.SUPABASE_URL || "", supabaseAnonKey: env.SUPABASE_ANON_KEY || "" });
+    }
+
     if (path === "/api/content" && req.method === "GET") {
       const content = await env.SITE.get("content");
       if (!content) return json({ error: "no content" }, 404);

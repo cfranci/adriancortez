@@ -68,9 +68,15 @@ label{display:block;font-size:.72rem;font-weight:600;letter-spacing:.12em;text-t
   <form class="login-card" id="loginForm">
     <h1>AC<span style="color:#1E7A6A">.</span></h1>
     <p>Adrian Cortez — site admin</p>
-    <input type="password" id="key" placeholder="Admin key" autocomplete="current-password" required>
+    <input type="email" id="email" placeholder="Email" autocomplete="username">
+    <input type="password" id="password" placeholder="Password" autocomplete="current-password">
     <button class="btn solid" style="width:100%" type="submit">Sign in</button>
     <div class="err" id="loginErr"></div>
+    <button type="button" id="showKey" style="background:none;border:none;color:#A7B9C9;font-size:.78rem;margin-top:1rem;cursor:pointer">Use admin key instead</button>
+    <div id="keyBox" class="hide" style="margin-top:.6rem">
+      <input type="password" id="key" placeholder="Admin key" autocomplete="off">
+      <button class="btn ghost light" style="width:100%;margin-top:.6rem" type="button" id="keyLogin">Sign in with key</button>
+    </div>
   </form>
 </div>
 
@@ -132,11 +138,33 @@ label{display:block;font-size:.72rem;font-weight:600;letter-spacing:.12em;text-t
   </main>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const api = (p, opt = {}) => fetch(p, { credentials: "same-origin", headers: { "Content-Type": "application/json" }, ...opt });
+let sbToken = null; // Supabase access token when signed in via email/password
+const api = (p, opt = {}) => {
+  const headers = { "Content-Type": "application/json", ...(opt.headers || {}) };
+  if (sbToken) headers["Authorization"] = "Bearer " + sbToken;
+  return fetch(p, { credentials: "same-origin", ...opt, headers });
+};
 window.$ = $; window.esc = esc; window.api = api;
+
+// Supabase client (email/password login). Falls back to admin-key if not configured.
+let supa = null;
+async function initSupabase() {
+  try {
+    const cfg = await (await fetch("/api/public-config")).json();
+    if (!cfg.supabaseUrl || !cfg.supabaseAnonKey || !window.supabase) return null;
+    supa = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
+      auth: { persistSession: true, autoRefreshToken: true },
+    });
+    const { data } = await supa.auth.getSession();
+    if (data.session) sbToken = data.session.access_token;
+    supa.auth.onAuthStateChange((_e, session) => { sbToken = session ? session.access_token : null; });
+    return supa;
+  } catch { return null; }
+}
 
 let content = null;
 let dirty = false;
@@ -148,14 +176,33 @@ async function boot() {
   const r = await api("/api/admin/session");
   if (r.ok) { $("#login").classList.add("hide"); $("#app").classList.remove("hide"); loadAll(); }
 }
+// email/password (Supabase) — primary
 $("#loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+  $("#loginErr").textContent = "";
+  if (!supa) { $("#loginErr").textContent = "Email login isn't available. Use the admin key."; return; }
+  const { data, error } = await supa.auth.signInWithPassword({
+    email: $("#email").value.trim(), password: $("#password").value,
+  });
+  if (error || !data.session) { $("#loginErr").textContent = "Wrong email or password."; return; }
+  sbToken = data.session.access_token;
+  $("#password").value = "";
+  boot();
+});
+// admin key — fallback (sets the cookie)
+$("#showKey").addEventListener("click", () => $("#keyBox").classList.toggle("hide"));
+$("#keyLogin").addEventListener("click", async () => {
   $("#loginErr").textContent = "";
   const r = await api("/api/admin/login", { method: "POST", body: JSON.stringify({ key: $("#key").value }) });
   if (r.ok) { $("#key").value = ""; boot(); }
   else $("#loginErr").textContent = "That key didn't work.";
 });
-$("#logout").addEventListener("click", async () => { await api("/api/admin/logout", { method: "POST" }); location.reload(); });
+$("#logout").addEventListener("click", async () => {
+  if (supa) { try { await supa.auth.signOut(); } catch {} }
+  sbToken = null;
+  await api("/api/admin/logout", { method: "POST" });
+  location.reload();
+});
 
 // ---------- tabs ----------
 document.querySelectorAll(".tabs button").forEach((b) =>
@@ -264,7 +311,7 @@ async function loadAll() {
   renderEditors();
 }
 window.addEventListener("beforeunload", (e) => { if (dirty) e.preventDefault(); });
-boot();
+initSupabase().then(boot);
 </script>
 <script src="/admin/crm.js"></script>
 <style>
