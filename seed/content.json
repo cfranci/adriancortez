@@ -1,0 +1,20 @@
+{
+  "heroSub": "Residential, luxury, and investment real estate, bought, sold, and leased across South Florida for nearly a decade.",
+  "heroEm": "Off-market reach. On-time answers.",
+  "listTitle": "Four doors at E11EVEN Residences.",
+  "listSub": "20 NE 11th St, Downtown Miami — listed floor by floor.",
+  "listings": [
+    { "floor": "PH", "name": "Penthouse 05", "spec": "Studio · 1 bath · For lease", "price": "$4,500", "per": "/mo", "url": "https://serhant.com/properties/20-ne-11th-st-unit-ph05-miami-fl-33132-75b40d34be9fef4e711fbced358b29b0", "img": "/assets/unit-ph05.jpg" },
+    { "floor": "60", "name": "Residence 6003", "spec": "4 bed · 4 bath · 2,693 sq ft · For sale", "price": "$7,500,000", "per": "", "url": "https://serhant.com/properties/20-ne-11th-st-6003-miami-fl-us-33132-9d2b8b62707dbb5a424a07eb6eb6dcab", "img": "/assets/unit-6003.jpg" },
+    { "floor": "44", "name": "Residence 4406", "spec": "2 bed · 2 bath · For lease", "price": "$5,000", "per": "/mo", "url": "https://serhant.com/properties/20-ne-11th-st-4406-miami-fl-us-33132-d50e1f3847bee4e8a880769ba4bf1388", "img": "/assets/unit-4406.jpg" },
+    { "floor": "15", "name": "Residence 1505", "spec": "1 bed · 1 bath · For lease", "price": "$3,500", "per": "/mo", "url": "https://serhant.com/properties/20-ne-11th-st-1505-miami-fl-us-33132-521e615388ef219578a95ff6b91fda49", "img": "/assets/unit-1505.jpg" }
+  ],
+  "solds": [
+    { "addr": "18611 SW 39th St · Miramar", "price": "$1,520,000" },
+    { "addr": "7999 NW 181st St · Hialeah", "price": "$725,000" },
+    { "addr": "951 Brickell Ave #1206 · Brickell", "price": "$640,000" },
+    { "addr": "732 Euclid Ave #4 · Miami Beach", "price": "$550,000" },
+    { "addr": "3106 SW 14th St · Fort Lauderdale", "price": "$460,000" },
+    { "addr": "2700 S University Dr #3C · Davie", "price": "$305,000" }
+  ]
+}
