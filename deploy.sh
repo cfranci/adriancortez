@@ -6,7 +6,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-export CLOUDFLARE_ACCOUNT_ID="d044293fa72b226f3efd250447a870fe"
+export CLOUDFLARE_ACCOUNT_ID="${CLOUDFLARE_ACCOUNT_ID:-a19dd580b1f108690dcd9b400cfd0898}"
 [ -f .env ] && set -a && source .env && set +a
 : "${CLOUDFLARE_API_TOKEN:?Set CLOUDFLARE_API_TOKEN (API KING account)}"
 
@@ -14,7 +14,7 @@ API="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID"
 AUTH=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN")
 
 echo "==> Verifying token"
-curl -sf "$API/tokens/verify" "${AUTH[@]}" >/dev/null || { echo "Token failed verification against account"; exit 1; }
+curl -s "https://api.cloudflare.com/client/v4/user/tokens/verify" "${AUTH[@]}" | grep -q '"success":true' || { echo "Token failed verification"; exit 1; }
 
 echo "==> KV namespace"
 KV_ID=$(curl -s "$API/storage/kv/namespaces?per_page=100" "${AUTH[@]}" | python3 -c "import sys,json; print(next((n['id'] for n in json.load(sys.stdin)['result'] if n['title'].endswith('SITE')), ''))")
