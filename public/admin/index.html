@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Adrian Cortez</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230E141C'/%3E%3Ctext x='32' y='44' font-family='Georgia,serif' font-size='34' fill='%23FCFBF8' text-anchor='middle'%3EAC%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Archivo:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0E141C;--paper:#FCFBF8;--tint:#F3F1EB;--slate:#5A626C;--tide:#14594E;--tide2:#1E7A6A;
+--line:rgba(14,20,28,.14);--display:"Bodoni Moda",Georgia,serif;--sans:"Archivo",sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sans);background:var(--tint);color:var(--ink);font-size:.95rem;line-height:1.55}
+h1{font-family:var(--display);font-weight:700;font-size:1.6rem}
+h2{font-family:var(--display);font-weight:600;font-size:1.2rem;margin-bottom:.9rem}
+.hide{display:none!important}
+/* login */
+.login{min-height:100vh;display:grid;place-items:center;background:var(--ink);color:var(--paper)}
+.login-card{width:min(92vw,380px);text-align:center}
+.login-card h1{font-size:2.2rem;margin-bottom:.4rem}
+.login-card p{color:#A7B9C9;margin-bottom:1.6rem;font-size:.85rem}
+.login-card input{width:100%;padding:.85rem 1rem;font:inherit;background:#16202B;border:1px solid rgba(252,251,248,.18);color:var(--paper);margin-bottom:.8rem}
+.login-card input:focus{outline:2px solid var(--tide2)}
+.err{color:#E58A7B;font-size:.82rem;min-height:1.2em;margin-top:.6rem}
+/* shell */
+.bar{background:var(--ink);color:var(--paper);display:flex;align-items:center;gap:1.4rem;padding:.8rem 1.4rem;position:sticky;top:0;z-index:5}
+.bar b{font-family:var(--display);font-size:1.15rem;font-weight:700}
+.tabs{display:flex;gap:.3rem;margin-left:1rem}
+.tabs button{font:inherit;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;background:none;border:none;color:#A7B9C9;padding:.5rem .8rem;cursor:pointer;border-bottom:2px solid transparent}
+.tabs button.on{color:var(--paper);border-color:var(--tide2)}
+.bar .out{margin-left:auto;font-size:.78rem;background:none;border:1px solid rgba(252,251,248,.25);color:var(--paper);padding:.45rem .9rem;cursor:pointer}
+main{max-width:960px;margin:2rem auto;padding:0 1.2rem}
+.panel{background:var(--paper);border:1px solid var(--line);padding:1.4rem;margin-bottom:1.4rem}
+/* buttons + inputs */
+.btn{font:inherit;font-size:.78rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:.7rem 1.2rem;border:1px solid transparent;cursor:pointer}
+.btn.solid{background:var(--tide);color:var(--paper)}
+.btn.solid:hover{background:var(--tide2)}
+.btn.ghost{background:none;border-color:var(--line)}
+.btn.sm{padding:.35rem .7rem;font-size:.7rem}
+.btn.danger{background:none;border-color:transparent;color:#B4483A}
+input,textarea,select{font:inherit;font-size:.9rem;padding:.55rem .7rem;border:1px solid var(--line);background:#fff;width:100%}
+input:focus,textarea:focus{outline:2px solid var(--tide2)}
+label{display:block;font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--slate);margin:.9rem 0 .3rem}
+/* leads */
+.lead{border:1px solid var(--line);padding:1rem 1.1rem;margin-bottom:.8rem;background:#fff;display:grid;grid-template-columns:1fr auto;gap:.6rem}
+.lead.handled{opacity:.55}
+.lead .who{font-weight:600}
+.lead .who a{color:var(--tide)}
+.lead .msg{grid-column:1/-1;color:var(--slate);white-space:pre-wrap}
+.lead .when{font-size:.75rem;color:var(--slate)}
+.lead .acts{display:flex;gap:.4rem;align-items:start}
+.count{display:inline-block;background:var(--tide);color:var(--paper);font-size:.7rem;padding:.1rem .5rem;border-radius:999px;margin-left:.4rem;vertical-align:middle}
+/* listing editor */
+.lrow{border:1px solid var(--line);background:#fff;padding:1rem;margin-bottom:.8rem;display:grid;grid-template-columns:repeat(6,1fr);gap:.6rem}
+.lrow .full{grid-column:1/-1}
+.lrow .half{grid-column:span 3}
+.savebar{position:sticky;bottom:0;background:var(--ink);padding:.9rem 1.2rem;display:flex;align-items:center;gap:1rem;margin:0 -1.2rem}
+.savebar .status{color:#A7B9C9;font-size:.82rem}
+@media(max-width:700px){.lrow{grid-template-columns:1fr 1fr}.lrow .half{grid-column:1/-1}}
+</style>
+</head>
+<body>
+
+<div class="login" id="login">
+  <form class="login-card" id="loginForm">
+    <h1>AC<span style="color:#1E7A6A">.</span></h1>
+    <p>Adrian Cortez — site admin</p>
+    <input type="password" id="key" placeholder="Admin key" autocomplete="current-password" required>
+    <button class="btn solid" style="width:100%" type="submit">Sign in</button>
+    <div class="err" id="loginErr"></div>
+  </form>
+</div>
+
+<div id="app" class="hide">
+  <div class="bar">
+    <b>AC.</b>
+    <div class="tabs">
+      <button data-tab="leads" class="on">Leads<span class="count hide" id="leadCount"></span></button>
+      <button data-tab="listings">Listings</button>
+      <button data-tab="copy">Site copy</button>
+    </div>
+    <button class="out" id="logout">Sign out</button>
+  </div>
+
+  <main>
+    <section id="tab-leads">
+      <div class="panel">
+        <h2>Lead inbox</h2>
+        <p style="color:var(--slate);font-size:.85rem;margin-bottom:1rem">Everything sent through the site's contact form. Tap a phone number to call back.</p>
+        <div id="leadList">Loading…</div>
+      </div>
+    </section>
+
+    <section id="tab-listings" class="hide">
+      <div class="panel">
+        <h2>Current listings</h2>
+        <p style="color:var(--slate);font-size:.85rem;margin-bottom:1rem">These render top-to-bottom on the site. Photo is a URL (use the listing photo from serhant.com or any image link).</p>
+        <div id="listingRows"></div>
+        <button class="btn ghost" id="addListing" type="button">+ Add listing</button>
+      </div>
+      <div class="panel">
+        <h2>Sold ledger</h2>
+        <div id="soldRows"></div>
+        <button class="btn ghost" id="addSold" type="button">+ Add sale</button>
+      </div>
+    </section>
+
+    <section id="tab-copy" class="hide">
+      <div class="panel">
+        <h2>Words on the site</h2>
+        <label for="heroSub">Hero paragraph</label>
+        <textarea id="heroSub" rows="3"></textarea>
+        <label for="heroEm">Hero closing line (bold part)</label>
+        <input id="heroEm">
+        <label for="listTitle">Listings headline</label>
+        <input id="listTitle">
+        <label for="listSub">Listings subline</label>
+        <input id="listSub">
+      </div>
+    </section>
+
+    <div class="savebar hide" id="savebar">
+      <button class="btn solid" id="save">Publish changes</button>
+      <span class="status" id="saveStatus">Unpublished edits</span>
+    </div>
+  </main>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const api = (p, opt = {}) => fetch(p, { credentials: "same-origin", headers: { "Content-Type": "application/json" }, ...opt });
+
+let content = null;
+let dirty = false;
+
+function markDirty() { dirty = true; $("#savebar").classList.remove("hide"); $("#saveStatus").textContent = "Unpublished edits"; }
+
+// ---------- auth ----------
+async function boot() {
+  const r = await api("/api/admin/session");
+  if (r.ok) { $("#login").classList.add("hide"); $("#app").classList.remove("hide"); loadAll(); }
+}
+$("#loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  $("#loginErr").textContent = "";
+  const r = await api("/api/admin/login", { method: "POST", body: JSON.stringify({ key: $("#key").value }) });
+  if (r.ok) { $("#key").value = ""; boot(); }
+  else $("#loginErr").textContent = "That key didn't work.";
+});
+$("#logout").addEventListener("click", async () => { await api("/api/admin/logout", { method: "POST" }); location.reload(); });
+
+// ---------- tabs ----------
+document.querySelectorAll(".tabs button").forEach((b) =>
+  b.addEventListener("click", () => {
+    document.querySelectorAll(".tabs button").forEach((x) => x.classList.toggle("on", x === b));
+    ["leads", "listings", "copy"].forEach((t) => $("#tab-" + t).classList.toggle("hide", t !== b.dataset.tab));
+  })
+);
+
+// ---------- leads ----------
+async function loadLeads() {
+  const r = await api("/api/admin/leads");
+  const leads = await r.json();
+  const fresh = leads.filter((l) => !l.handled).length;
+  $("#leadCount").textContent = fresh;
+  $("#leadCount").classList.toggle("hide", !fresh);
+  $("#leadList").innerHTML = leads.length ? leads.map((l) => `
+    <div class="lead ${l.handled ? "handled" : ""}">
+      <div>
+        <div class="who">${esc(l.name)} — <a href="tel:${esc(l.phone)}">${esc(l.phone)}</a>${l.email ? " · " + esc(l.email) : ""}</div>
+        <div class="when">${esc(new Date(l.ts).toLocaleString())}</div>
+      </div>
+      <div class="acts">
+        <button class="btn sm ghost" data-act="handled" data-id="${esc(l.id)}">${l.handled ? "Reopen" : "Done"}</button>
+        <button class="btn sm danger" data-act="delete" data-id="${esc(l.id)}">Delete</button>
+      </div>
+      ${l.message ? `<div class="msg">${esc(l.message)}</div>` : ""}
+    </div>`).join("") : '<p style="color:var(--slate)">No leads yet. They\'ll land here the moment someone submits the form.</p>';
+}
+$("#leadList").addEventListener("click", async (e) => {
+  const b = e.target.closest("button[data-act]");
+  if (!b) return;
+  if (b.dataset.act === "delete" && !confirm("Delete this lead for good?")) return;
+  await api(`/api/admin/leads/${encodeURIComponent(b.dataset.id)}/${b.dataset.act}`, { method: "POST" });
+  loadLeads();
+});
+
+// ---------- content editors ----------
+function listingRow(l = {}, i) {
+  return `<div class="lrow" data-i="${i}">
+    <div><label>Floor tag</label><input data-f="floor" value="${esc(l.floor)}"></div>
+    <div class="half"><label>Name</label><input data-f="name" value="${esc(l.name)}"></div>
+    <div class="half"><label>Spec line</label><input data-f="spec" value="${esc(l.spec)}"></div>
+    <div><label>Price</label><input data-f="price" value="${esc(l.price)}"></div>
+    <div><label>Per (blank or /mo)</label><input data-f="per" value="${esc(l.per)}"></div>
+    <div class="full"><label>Listing URL</label><input data-f="url" value="${esc(l.url)}"></div>
+    <div class="full"><label>Photo URL</label><input data-f="img" value="${esc(l.img)}"></div>
+    <div><button class="btn sm danger" data-del="${i}" type="button">Remove</button></div>
+  </div>`;
+}
+function soldRow(s = {}, i) {
+  return `<div class="lrow" data-i="${i}" style="grid-template-columns:2fr 1fr auto">
+    <div><label>Address · Area</label><input data-f="addr" value="${esc(s.addr)}"></div>
+    <div><label>Price</label><input data-f="price" value="${esc(s.price)}"></div>
+    <div style="align-self:end"><button class="btn sm danger" data-del="${i}" type="button">Remove</button></div>
+  </div>`;
+}
+function renderEditors() {
+  $("#listingRows").innerHTML = (content.listings || []).map((l, i) => listingRow(l, i)).join("");
+  $("#soldRows").innerHTML = (content.solds || []).map((s, i) => soldRow(s, i)).join("");
+  $("#heroSub").value = content.heroSub || "";
+  $("#heroEm").value = content.heroEm || "";
+  $("#listTitle").value = content.listTitle || "";
+  $("#listSub").value = content.listSub || "";
+}
+function collect() {
+  content.listings = [...$("#listingRows").querySelectorAll(".lrow")].map((r) => {
+    const o = {}; r.querySelectorAll("[data-f]").forEach((el) => (o[el.dataset.f] = el.value.trim())); return o;
+  });
+  content.solds = [...$("#soldRows").querySelectorAll(".lrow")].map((r) => {
+    const o = {}; r.querySelectorAll("[data-f]").forEach((el) => (o[el.dataset.f] = el.value.trim())); return o;
+  });
+  content.heroSub = $("#heroSub").value.trim();
+  content.heroEm = $("#heroEm").value.trim();
+  content.listTitle = $("#listTitle").value.trim();
+  content.listSub = $("#listSub").value.trim();
+}
+document.addEventListener("input", (e) => { if (e.target.closest("#tab-listings,#tab-copy")) markDirty(); });
+$("#listingRows").addEventListener("click", delHandler("listings"));
+$("#soldRows").addEventListener("click", delHandler("solds"));
+function delHandler(kind) {
+  return (e) => {
+    const b = e.target.closest("[data-del]");
+    if (!b) return;
+    collect();
+    content[kind].splice(Number(b.dataset.del), 1);
+    renderEditors(); markDirty();
+  };
+}
+$("#addListing").addEventListener("click", () => { collect(); (content.listings ||= []).push({}); renderEditors(); markDirty(); });
+$("#addSold").addEventListener("click", () => { collect(); (content.solds ||= []).push({}); renderEditors(); markDirty(); });
+
+$("#save").addEventListener("click", async () => {
+  collect();
+  $("#saveStatus").textContent = "Publishing…";
+  const r = await api("/api/admin/content", { method: "PUT", body: JSON.stringify(content) });
+  $("#saveStatus").textContent = r.ok ? "Live. The site updates within a minute." : "Publish failed, try again.";
+  if (r.ok) dirty = false;
+});
+
+async function loadAll() {
+  loadLeads();
+  const r = await api("/api/admin/content");
+  content = (await r.json()) || {};
+  renderEditors();
+}
+window.addEventListener("beforeunload", (e) => { if (dirty) e.preventDefault(); });
+boot();
+</script>
+</body>
+</html>

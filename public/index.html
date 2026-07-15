@@ -7,7 +7,8 @@
 <meta name="description" content="Adrian Cortez, Lead Agent at SERHANT. Brickell. Residential, luxury, and investment real estate across Miami-Dade and Broward. Off-market reach, on-time answers.">
 <meta property="og:title" content="Adrian Cortez — Miami &amp; Broward Real Estate">
 <meta property="og:description" content="Residential, luxury, and investment real estate across Miami-Dade and Broward. Lead Agent, SERHANT. Brickell.">
-<meta property="og:image" content="assets/headshot.jpg">
+<meta property="og:image" content="https://adriancortez..workers.dev/assets/headshot.jpg">
+<link rel="canonical" href="https://adriancortez..workers.dev/">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230E141C'/%3E%3Ctext x='32' y='44' font-family='Georgia,serif' font-size='34' fill='%23FCFBF8' text-anchor='middle'%3EAC%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -185,7 +186,22 @@
       <a class="btn ghost light" href="https://www.instagram.com/adcortez_/" target="_blank" rel="noopener">Instagram</a>
       <a class="btn ghost light" href="https://www.linkedin.com/in/adriancortezrealtor/" target="_blank" rel="noopener">LinkedIn</a>
     </div>
+    <form class="lead-form reveal" id="leadForm" autocomplete="on">
+      <div class="lead-grid">
+        <input type="text" name="name" placeholder="Your name" required aria-label="Your name">
+        <input type="tel" name="phone" placeholder="Phone" required aria-label="Phone">
+      </div>
+      <textarea name="message" rows="3" placeholder="What are you trying to do? Buy, sell, lease, invest&hellip;" aria-label="Message"></textarea>
+      <input type="text" name="company" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">
+      <button class="btn solid" type="submit">Send to Adrian</button>
+      <p class="form-err" role="alert"></p>
+    </form>
   </section>
+
+  <div class="sticky-cta" id="stickyCta">
+    <a class="btn solid" href="sms:+19546650665">Text Adrian</a>
+    <a class="btn ghost" href="tel:+19546650665">Call</a>
+  </div>
 
 </main>
 
